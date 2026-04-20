@@ -1,4 +1,4 @@
-# PaperPal (MVP in 1 Day)
+# PaperPal
 
 PaperPal is a Retrieval-Augmented Generation (RAG) system for helping students read research papers.
 
