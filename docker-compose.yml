@@ -1,0 +1,10 @@
+services:
+  paperpal:
+    build: .
+    ports:
+      - "8501:8080"
+    environment:
+      GENERATOR_PROVIDER: local
+    # Optional: edit PDFs locally without rebuilding the image
+    volumes:
+      - ./data/papers:/app/data/papers:ro

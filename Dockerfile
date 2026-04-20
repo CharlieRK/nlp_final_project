@@ -13,4 +13,5 @@ COPY . /app
 ENV PORT=8080
 EXPOSE 8080
 
-CMD ["sh", "-c", "streamlit run app.py --server.port=${PORT} --server.address=0.0.0.0"]
+# Build FAISS index from bundled PDFs, then start Streamlit (works on fresh clone without committed index).
+CMD ["sh", "-c", "python src/ingest.py && streamlit run app.py --server.port=${PORT} --server.address=0.0.0.0 --server.headless=true --server.enableCORS=false --server.enableXsrfProtection=false"]

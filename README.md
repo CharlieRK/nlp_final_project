@@ -59,6 +59,54 @@ streamlit run app.py
 
 Then open the local URL shown in terminal.
 
+## Run with Docker + Streamlit (no GCP)
+
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine).
+
+**Option A — Docker Compose (recommended)**
+
+```bash
+cd nlp6120_final_project
+docker compose up --build
+```
+
+Open **http://localhost:8501** (first start runs `ingest.py` inside the container and may take a few minutes).
+
+Stop: `Ctrl+C` or `docker compose down`.
+
+**Option B — Docker only**
+
+```bash
+docker build -t paperpal:latest .
+docker run --rm -p 8501:8080 -e GENERATOR_PROVIDER=local paperpal:latest
+```
+
+Open **http://localhost:8501**.
+
+Notes:
+
+- Default generator in code is **`local`** (no API keys). Override with `-e` if needed.
+- Put PDFs in `data/papers/` before `docker build`, or use the compose volume mount and **rebuild** after adding papers (`docker compose up --build`).
+
+## Deploy online with Streamlit Community Cloud (no GCP)
+
+1. Push this repo to **GitHub** (PDFs under `data/papers/` must be committed so the cloud app can read them).
+2. Open [Streamlit Community Cloud](https://share.streamlit.io/) → **Sign in** → **New app**.
+3. Pick your **repository** and **branch** (`main`).
+4. **Main file path:** `app.py`
+5. **App URL:** Cloud assigns `https://<your-app>.streamlit.app` (you can rename in settings).
+
+On first open, the app runs **`ingest.py` automatically** if the FAISS index is missing (same as Docker), so the **first load can take several minutes** (downloads embedding weights + builds index).
+
+**Optional — Secrets** (only if you switch off `local` mode):  
+App settings → **Secrets** → TOML, e.g.:
+
+```toml
+GENERATOR_PROVIDER = "local"
+```
+
+**Note:** Free tier has **memory/time limits**. If the app crashes during ingest, try fewer PDFs in `data/papers/` or upgrade the Streamlit workspace. `runtime.txt` pins **Python 3.10.12** for compatibility.
+
 ## Optional: local model fallback (Ollama)
 
 If you want local inference:
@@ -94,6 +142,9 @@ If using Ollama, set `GENERATOR_PROVIDER=ollama` in `.env`.
 ```text
 .
 ├── app.py
+├── Dockerfile
+├── docker-compose.yml
+├── runtime.txt
 ├── requirements.txt
 ├── src
 │   ├── config.py

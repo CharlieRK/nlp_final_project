@@ -1,6 +1,31 @@
+import subprocess
+import sys
+from pathlib import Path
+
 import streamlit as st
 
+from src.config import CHUNKS_FILE, VECTOR_DIR
 from src.rag import RagEngine
+
+
+def _ensure_vector_index() -> None:
+    """Build FAISS index on first run (e.g. Streamlit Community Cloud has no pre-built index)."""
+    index_path = VECTOR_DIR / "index.faiss"
+    if index_path.exists() and CHUNKS_FILE.exists():
+        return
+    root = Path(__file__).resolve().parent
+    ingest_script = root / "src" / "ingest.py"
+    result = subprocess.run(
+        [sys.executable, str(ingest_script)],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        timeout=3600,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            result.stderr or result.stdout or f"ingest failed with code {result.returncode}"
+        )
 
 
 st.set_page_config(page_title="PaperPal", layout="wide")
@@ -9,6 +34,8 @@ st.caption("Ask questions about your paper corpus. Answers are grounded with cit
 
 if "engine" not in st.session_state:
     try:
+        with st.spinner("Checking index… (first deploy may build from PDFs, several minutes)"):
+            _ensure_vector_index()
         st.session_state.engine = RagEngine()
     except Exception as e:
         st.error(f"Initialization failed: {e}")
