@@ -103,9 +103,3 @@ If using Ollama, set `GENERATOR_PROVIDER=ollama` in `.env`.
 │   └── papers
 └── report.md
 ```
-
-## Tomorrow plan (you said)
-
-1. Push to GitHub
-2. Deploy Streamlit service on GCP
-3. Prepare one-page presentation slide
