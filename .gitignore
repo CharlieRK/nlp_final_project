@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.DS_Store
+*.pyc
+*.pyo
+.env
+
+data/vectorstore/
+data/chunks.jsonl
